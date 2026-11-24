@@ -8,6 +8,7 @@ signal healed(amount: int)
 signal died
 
 @export_range(1, 1000) var max_health: int = 100
+@export var invincible: bool = false
 
 var current_health: int:
 	set(value):
@@ -27,7 +28,7 @@ func is_dead() -> bool:
 
 ## Returns the damage actually dealt after clamping.
 func take_damage(amount: int) -> int:
-	if is_dead() or amount <= 0:
+	if is_dead() or invincible or amount <= 0:
 		return 0
 	var before := current_health
 	current_health -= amount
@@ -43,4 +44,6 @@ func heal(amount: int) -> void:
 		return
 	var before := current_health
 	current_health += amount
-	healed.emit(current_health - before)
+	var restored := current_health - before
+	if restored > 0:
+		healed.emit(restored)

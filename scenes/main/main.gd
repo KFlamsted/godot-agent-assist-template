@@ -1,8 +1,10 @@
 extends Node3D
 
+@onready var player: Player = $Player
+
 
 func _ready() -> void:
-	EventBus.player_died.connect(_on_player_died)
+	player.died.connect(_on_player_died)
 
 
 func _on_player_died() -> void:
