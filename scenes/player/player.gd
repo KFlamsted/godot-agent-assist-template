@@ -33,4 +33,5 @@ func _physics_process(delta: float) -> void:
 func _on_health_died() -> void:
 	set_physics_process(false)
 	died.emit()
+	# The parent listens to `died`; the EventBus event is for unrelated systems such as HUD or audio.
 	EventBus.player_died.emit()
