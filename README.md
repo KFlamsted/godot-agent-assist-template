@@ -14,6 +14,7 @@ A Godot 4.7 starter for **agent-assisted** development: you build the game in th
 
 ```
 .claude/skills/godot-gdscript-conventions/  Agent skill: Godot 4 GDScript conventions
+.claude/agents/gdscript-reviewer.md         Subagent that reviews GDScript against the conventions
 docs/godot-gdscript-rules.md                Full convention rules, readable by humans and agents
 AGENTS.md                                   Agent instructions (CLAUDE.md imports it)
 autoloads/event_bus.gd                      Global signal bus (Autoload "EventBus")
