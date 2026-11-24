@@ -1,3 +1,16 @@
 # Godot 4+ specific ignores
 .godot/
 /android/
+
+# Export output
+/build/
+
+# Per-user Claude Code settings
+.claude/settings.local.json
+
+# Blender backups
+*.blend1
+
+# OS files
+.DS_Store
+Thumbs.db

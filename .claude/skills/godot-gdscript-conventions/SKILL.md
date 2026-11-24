@@ -5,13 +5,13 @@ description: Conventions, patterns and pitfalls for writing Godot 4 GDScript. Us
 
 # Godot 4 GDScript Conventions
 
-This document contains rules for writing correct, idiomatic Godot 4 GDScript: workflow, Godot 3 syntax to avoid, script layout, and common pitfalls.
+This document contains rules for writing correct, idiomatic Godot 4 GDScript: workflow, Godot 3 syntax to avoid, script layout, and common pitfalls. Adapted from wshobson/agents `godot-gdscript-patterns` (MIT).
 
 ## Workflow for every script change
 1. Check the Godot version in `project.godot` (`config/features`). Write Godot 4 syntax only.
 2. Read the scripts and scenes the change touches before editing. Existing project conventions win over these rules.
 3. Only change the files the user asked for. If another file needs changing, say so instead of editing it silently.
-4. If you can run Godot headless, run it and read parse/script errors before reporting done. Otherwise list what the user should check in the editor.
+4. Run the headless check from `AGENTS.md` and fix parse/script errors before reporting done. If you can't run Godot, list what the user should check in the editor.
 
 ## Godot 3 drift (most common failure)
 Most GDScript online is Godot 3, so models drift into it. Never write the left side:
@@ -28,7 +28,7 @@ Most GDScript online is Godot 3, so models drift into it. Never write the left s
 | `TileMap` layers | `TileMapLayer` nodes |
 
 ## Script layout
-Order: `class_name`/`extends` → `signal` (past tense) → `enum`/`const` → `@export` (with `@export_group`, `@export_range`) → public vars → `_private` vars → `@onready` refs → built-ins → public methods → `_private` methods.
+Order: `class_name`/`extends` → `signal` (past tense) → `enum`/`const` → `@export` (with `@export_group`, `@export_range`) → public vars → `_private` vars → `@onready` refs → built-ins → public methods → `_private` methods. Indent with tabs; GDScript rejects a file that mixes tabs and spaces.
 
 ```gdscript
 class_name Player
@@ -41,8 +41,8 @@ var _health: int
 @onready var sprite: Sprite2D = $Sprite2D
 
 func _physics_process(_delta: float) -> void:
-    velocity = Input.get_vector("left", "right", "up", "down") * speed
-    move_and_slide()
+	velocity = Input.get_vector("left", "right", "up", "down") * speed
+	move_and_slide()
 ```
 
 ## Typing
@@ -56,11 +56,11 @@ Type vars, params and returns (`-> void`); use `:=` when the type is obvious. Us
 
 ```gdscript
 var current_health: int:
-    set(value):
-        var old := current_health
-        current_health = clampi(value, 0, max_health)
-        if current_health != old:
-            health_changed.emit(current_health, max_health)
+	set(value):
+		var old := current_health
+		current_health = clampi(value, 0, max_health)
+		if current_health != old:
+			health_changed.emit(current_health, max_health)
 ```
 
 ## Autoloads
@@ -80,16 +80,16 @@ Node-based: a `StateMachine` node with `State` children. Disable inactive states
 ```gdscript
 # State API: enter(msg), exit(), update(delta), physics_update(delta), handle_input(event)
 func transition_to(state_name: StringName, msg: Dictionary = {}) -> void:
-    if not states.has(state_name):
-        push_error("State '%s' not found" % state_name)
-        return
-    var previous := current_state
-    previous.exit()
-    previous.process_mode = Node.PROCESS_MODE_DISABLED
-    current_state = states[state_name]
-    current_state.process_mode = Node.PROCESS_MODE_INHERIT
-    current_state.enter(msg)
-    state_changed.emit(previous.name, current_state.name)
+	if not states.has(state_name):
+		push_error("State '%s' not found" % state_name)
+		return
+	var previous := current_state
+	previous.exit()
+	previous.process_mode = Node.PROCESS_MODE_DISABLED
+	current_state = states[state_name]
+	current_state.process_mode = Node.PROCESS_MODE_INHERIT
+	current_state.enter(msg)
+	state_changed.emit(previous.name, current_state.name)
 ```
 
 ## Components
@@ -110,17 +110,17 @@ Use a SceneManager Autoload. Skip loading with `ResourceLoader.has_cached(path)`
 ```gdscript
 ResourceLoader.load_threaded_request(path)
 while true:
-    var progress := []
-    match ResourceLoader.load_threaded_get_status(path, progress):
-        ResourceLoader.THREAD_LOAD_IN_PROGRESS:
-            loading_progress.emit(progress[0])
-            await get_tree().process_frame
-        ResourceLoader.THREAD_LOAD_LOADED:
-            _swap_scene((ResourceLoader.load_threaded_get(path) as PackedScene).instantiate())
-            return
-        _:
-            push_error("Failed to load scene: %s" % path)
-            return
+	var progress := []
+	match ResourceLoader.load_threaded_get_status(path, progress):
+		ResourceLoader.THREAD_LOAD_IN_PROGRESS:
+			loading_progress.emit(progress[0])
+			await get_tree().process_frame
+		ResourceLoader.THREAD_LOAD_LOADED:
+			_swap_scene((ResourceLoader.load_threaded_get(path) as PackedScene).instantiate())
+			return
+		_:
+			push_error("Failed to load scene: %s" % path)
+			return
 ```
 
 Swap: `queue_free()` the old scene, `add_child` the new one to `get_tree().root`, set `get_tree().current_scene`. Await transitions around the swap.
@@ -134,10 +134,10 @@ Swap: `queue_free()` the old scene, `add_child` the new one to `get_tree().root`
 - `open_encrypted_with_pass` with a key in source only deters casual editing.
 
 ```gdscript
-var data = JSON.parse_string(file.get_as_text())
+var data: Variant = JSON.parse_string(file.get_as_text())
 if typeof(data) != TYPE_DICTIONARY:
-    push_error("Invalid save data")
-    return {}
+	push_error("Invalid save data")
+	return {}
 var level := int(data.get("level", 1))
 ```
 
